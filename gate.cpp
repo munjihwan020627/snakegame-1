@@ -69,19 +69,53 @@ Position Gate::get_new_position(Position current, Position gate, int* dx, int* d
         *dy = -1;
     } else {
         // 가운데 벽 또는 추가 벽
-        if (*dx != 0) {
-            new_x = gate.x + *dx;
-        } else {
-            new_y = gate.y + *dy;
+        if (*dx == 1) {
+            // 오른쪽에서 진입
+            new_x = gate.x + 1;
+        } else if (*dx == -1) {
+            // 왼쪽에서 진입
+            new_x = gate.x - 1;
+        } else if (*dy == 1) {
+            // 아래쪽에서 진입
+            new_y = gate.y + 1;
+        } else if (*dy == -1) {
+            // 위쪽에서 진입
+            new_y = gate.y - 1;
         }
-    }
 
-    // 새로운 위치가 벽인지 확인
-    while (new_x <= 0 || new_x >= 22 || new_y <= 0 || new_y >= 22) {
-        if (*dx != 0) {
-            new_x += *dx;
-        } else {
-            new_y += *dy;
+        // 진입 방향과 일치하는 방향이 불가능한 경우
+        if (new_x <= 0 || new_x >= 22 || new_y <= 0 || new_y >= 22) {
+            if (*dx == 1 || *dx == -1) {
+                // 좌-우로 진입한 경우
+                if (*dx == 1) {
+                    new_x = gate.x - 1; // 좌로 진출
+                } else {
+                    new_x = gate.x + 1; // 우로 진출
+                }
+                // 진출 방향이 불가능한 경우 시계방향으로 회전
+                if (new_x <= 0 || new_x >= 22) {
+                    if (*dx == 1) {
+                        new_y = gate.y + 1; // 아래로 진출
+                    } else {
+                        new_y = gate.y - 1; // 위로 진출
+                    }
+                }
+            } else {
+                // 상-하로 진입한 경우
+                if (*dy == 1) {
+                    new_y = gate.y - 1; // 위로 진출
+                } else {
+                    new_y = gate.y + 1; // 아래로 진출
+                }
+                // 진출 방향이 불가능한 경우 시계방향으로 회전
+                if (new_y <= 0 || new_y >= 22) {
+                    if (*dy == 1) {
+                        new_x = gate.x + 1; // 우로 진출
+                    } else {
+                        new_x = gate.x - 1; // 좌로 진출
+                    }
+                }
+            }
         }
     }
 

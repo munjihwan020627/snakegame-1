@@ -55,15 +55,43 @@ int main() {
         int ch = getch();
         switch (ch) {
             case KEY_UP:
+                if (dy == 1) {
+                    mvprintw(max_y / 2, max_x / 2 - 5, "Game Over");
+                    refresh();
+                    getch();
+                    endwin();
+                    return 0;
+                }
                 if (dy == 0) { dx = 0; dy = -1; }
                 break;
             case KEY_DOWN:
+                if (dy == -1) {
+                    mvprintw(max_y / 2, max_x / 2 - 5, "Game Over");
+                    refresh();
+                    getch();
+                    endwin();
+                    return 0;
+                }
                 if (dy == 0) { dx = 0; dy = 1; }
                 break;
             case KEY_LEFT:
+                if (dx == 1) {
+                    mvprintw(max_y / 2, max_x / 2 - 5, "Game Over");
+                    refresh();
+                    getch();
+                    endwin();
+                    return 0;
+                }
                 if (dx == 0) { dx = -1; dy = 0; }
                 break;
             case KEY_RIGHT:
+                if (dx == -1) {
+                    mvprintw(max_y / 2, max_x / 2 - 5, "Game Over");
+                    refresh();
+                    getch();
+                    endwin();
+                    return 0;
+                }
                 if (dx == 0) { dx = 1; dy = 0; }
                 break;
             case 'q':
@@ -95,6 +123,8 @@ int main() {
             break;
         }
 
+        item_manager.remove_old_items(); // 오래된 아이템 제거
+
         if (item_manager.check_item(snake, growth_items_collected, poison_items_collected)) {
             if (snake.body.size() >= missions[stage].target_length &&
                 growth_items_collected >= missions[stage].target_growth_items &&
@@ -105,7 +135,10 @@ int main() {
                 if (stage >= sizeof(missions) / sizeof(missions[0])) {
                     mvprintw(max_y / 2, max_x / 2 - 5, "You Win!");
                     refresh();
-                    break;
+                    napms(3000); // 3초 대기
+                    getch();
+                    endwin();
+                    return 0;
                 }
 
                 // 다음 스테이지 초기화
@@ -117,11 +150,12 @@ int main() {
                 item_manager.clear_items(); // 아이템 초기화
                 show_stage_map(game_map, current_map); // 새로운 맵을 표시하고 대기
                 map_show_end_time = time(nullptr) + 3; // 맵을 보여주는 시간이 끝나는 시점
+                last_item_time = time(nullptr) + 5; // 5초 후에 아이템 생성
             }
         }
 
-        if (current_time >= map_show_end_time && current_time - last_item_time >= 5) {
-            item_manager.create_item(max_x, max_y);
+        if (current_time >= map_show_end_time && current_time >= last_item_time) {
+            item_manager.create_item(max_x, max_y, current_map); // 벽 위치 전달
             last_item_time = current_time;
         }
 

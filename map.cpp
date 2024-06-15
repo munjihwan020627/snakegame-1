@@ -1,26 +1,28 @@
 #include "map.h"
-#include <cstdlib>
+#include <ncurses.h>
+#include <ctime>
 
-void Map::draw_map(const std::vector<Position>& map) const {
-    for (const auto& pos : map) {
-        if ((pos.x == 0 && pos.y == 0) || (pos.x == 0 && pos.y == 22) || 
-            (pos.x == 22 && pos.y == 0) || (pos.x == 22 && pos.y == 22)) {
-            mvaddch(pos.y, pos.x, 'X');
-        } else {
-            mvaddch(pos.y, pos.x, '0');
-        }
-    }
-}
-
-void Map::printScorePlaytime(time_t start_time, int growth_items_collected, int poison_items_collected, int current_length, const Mission& mission) const {
+void Map::printScorePlaytime(time_t start_time, int growth_items_collected, int poison_items_collected, int snake_length, const Mission& mission) {
     time_t current_time = time(nullptr);
     int play_time = static_cast<int>(difftime(current_time, start_time));
-    
-    int minutes = play_time / 60;
-    int seconds = play_time % 60;
 
-    mvprintw(1, 24, "Time: %02d:%02d", minutes, seconds);
-    mvprintw(2, 24, "Growth Items: %d/%d", growth_items_collected, mission.target_growth_items);
-    mvprintw(3, 24, "Poison Items: %d/%d", poison_items_collected, mission.target_poison_items);
-    mvprintw(4, 24, "Length: %d/%d", current_length, mission.target_length);
+    mvprintw(0, 24, "Play Time: %d", play_time);
+    mvprintw(1, 24, "Growth Items: %d/%d", growth_items_collected, mission.target_growth_items);
+    mvprintw(2, 24, "Poison Items: %d/%d", poison_items_collected, mission.target_poison_items);
+    mvprintw(3, 24, "Snake Length: %d/%d", snake_length, mission.target_length);
+}
+
+void Map::draw_map(const std::vector<Position>& walls) const {
+    clear();
+    for (const auto& wall : walls) {
+        mvaddch(wall.y, wall.x, '0');
+    }
+    mark_corners();  // 모서리 표시 함수 호출
+}
+
+void Map::mark_corners() const {
+    mvaddch(0, 0, 'X');
+    mvaddch(0, 22, 'X');
+    mvaddch(22, 0, 'X');
+    mvaddch(22, 22, 'X');
 }
