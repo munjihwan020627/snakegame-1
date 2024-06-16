@@ -172,9 +172,10 @@ int main() {
         gate_manager.draw_gates();
         game_map.printScorePlaytime(start_time, growth_items_collected, poison_items_collected, snake.body.size(), missions[stage]);
         refresh();
-        napms(100); // 0.1초 대기
+        napms(230); // 0.23초 대기
     }
 
+    napms(5000);
     getch();
     endwin(); // ncurses 모드 종료
 
